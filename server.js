@@ -19,7 +19,6 @@ const unitFees = require("./routes/units/unit_fees");
 const lease = require("./routes/leases/leases");
 const payments = require("./routes/payments/payments");
 const leaseFees = require("./routes/leases/lease_fees");
-
 const app = express(); //Initialized express
 
 app.use(cookieParser())
@@ -54,19 +53,17 @@ app.post("/api/validate-token", (req, res)=>{
 })
 
 app.use("/api/user",  user);  //Route for /user endpoint of API
-app.use("/api/test", test)
-app.use("/api/lookups", lookups)
-app.use("/api/tenants", tenants)
-app.use("/api/projects", projects)
-app.use("/api/properties", properties)
-app.use("/api/units", units)
+app.use("/api/test", test);
+app.use("/api/lookups", lookups);
+app.use("/api/tenants", tenants);
+app.use("/api/projects", projects);
+app.use("/api/properties", properties);
+app.use("/api/units", units);
 app.use("/api/unit_fees", unitFees);
-app.use("/api/users", users)
+app.use("/api/users", users);
 app.use("/api/lease", lease);
 app.use("/api/leases/lease_fees", leaseFees);
 app.use("/api/payments", payments);
-
-
 
 app.listen(port, (err) => {
     if(err){
@@ -77,11 +74,7 @@ app.listen(port, (err) => {
     }
 })
 
-
-
-
 pool.connect((err) => { 
-
     //Connected Database
     if (err) {
         console.log(err);
