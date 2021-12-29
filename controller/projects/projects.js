@@ -4,15 +4,8 @@ exports.getProjects = async(req, res)=>{
 
     try {
         const data = await pool.query(
-            `SELECT id,
-                    project_name as name,
-                    number,
-                    region,
-                    country,
-                    city,
-                    street
-            FROM 
-                    public.projects`);
+            `SELECT *
+             FROM all_projects`);
         const rows = data.rows;
         if(rows.length === 0){
             res.json({
@@ -35,20 +28,15 @@ exports.addProject = async(req, res)=>{
     const {number, name,  region, country, city, street} = req.body
     
     try {
-            const data = await pool.query(
-                `INSERT INTO public.projects (number, project_name,  region, country, city, street)
-                VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-                [number, name,  region, country, city, street], (err, result)=>{
-                    if(err){
-                        res.status(500).json({
-                            error: `Error adding project: ${err}`
-                        })
-                    }else{
-                        res.status(200).json({
-                            message: "Project Added!"
-                        })
-                    }
-            });
+        console.log()
+        const data = await pool.query(
+            `CALL add_project ($1, $2, $3, $4, $5, $6)`,
+            [number, name,  region, country, city, street], (err, result)=>{
+                if(err) throw err
+                res.status(200).json({
+                    message: "Project Added!"
+                })
+        });
         
     } catch (error) {
         console.log('Error:', error);

@@ -6,12 +6,9 @@ exports.getUnitFees = async(req, res)=>{
     try {
         const data = await pool.query(
             `SELECT *
-            FROM 
-                public.unit_fees
-            
-            JOIN public.fees fees ON fees.id = fee_id
+            FROM Unit_Fees_
             WHERE unit_id = $1
-             `, [unitId]);
+            `, [unitId]);
         const rows = data.rows;
         if(rows.length === 0){
             res.json({

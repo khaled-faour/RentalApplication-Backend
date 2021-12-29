@@ -1,13 +1,13 @@
 const pool= require("../../configs/database");
 const { map } = require("../../routes/lookups");
 
-exports.getPayments = async(req, res)=>{
+exports.getReceipts = async(req, res)=>{
 
     try {
         const data = await pool.query(
             `SELECT *
             FROM 
-                    public.payments`);
+                    public.receipts`);
         const rows = data.rows;
         if(rows.length === 0){
             res.json({
@@ -26,32 +26,31 @@ exports.getPayments = async(req, res)=>{
     }
 }
 
-exports.addPayment = async(req, res)=>{
-    const {paymentDate, receivedFrom,  note, lease, paymentType, fees, user} = req.body
+exports.addReceipt = async(req, res)=>{
+    let {paymentDate, receivedFrom,  note, lease, paymentType, fees, user} = req.body
     const leaseId = lease.id;
     const tenantId = lease.tenant_id;
+
     let amount = 0;
-    fees.map(fee=>{
+    fees.map((fee, index)=>{
         amount += fee.price;
+        const keys = Object.keys(fee)
+        keys.map(key=>{
+            if(key === 'price' || key === 'fee_id'){
+                return ;
+            }
+            return delete fees[index][key]
+        })
     })
     
     try {   
-            console.log(req.body)
-            const data = await pool.query(
-                `INSERT INTO public.payments (amount, payment_date, received_from, notes, lease_id, payment_type, "user", tenant_id)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-                [amount, paymentDate, receivedFrom,  note, leaseId, paymentType, user, tenantId], (err, result)=>{
-                    if(err){
-                        console.log(err)
-                        res.status(500).json({
-                            error: `Error adding payment: ${err}`
-                        })
-                    }else{
-                        res.status(200).json({
-                            message: "Payment Added!"
-                        })
-                    }
-            });
+            
+            const data = pool.query(
+                `CALL add_receipt($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+                [amount, paymentDate, receivedFrom,  note, leaseId, paymentType, user, tenantId, JSON.stringify(fees)], (err, result)=>{
+                    if(err) throw err;
+                    console.log("Payment Added!");
+            })
         
     } catch (error) {
         console.log('Error:', error);
@@ -61,7 +60,7 @@ exports.addPayment = async(req, res)=>{
     }
 }
 
-exports.editPayment = async(req, res)=>{
+exports.editReceipt = async(req, res)=>{
     const {id, description} = req.body
     console.log("ID: ",id, " | ", "Description: ", description)
     
@@ -87,7 +86,7 @@ exports.editPayment = async(req, res)=>{
     }
 }
 
-exports.deletePayment = async(req, res)=>{
+exports.deleteReceipt = async(req, res)=>{
     const {id} = req.body
     console.log("ID: ",id)
     try {

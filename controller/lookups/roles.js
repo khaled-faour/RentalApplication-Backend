@@ -23,10 +23,12 @@ exports.getRoles = async(req, res)=>{
 }
 
 exports.addRole = async(req, res)=>{
-    const {role} = req.body
+    const {description} = req.body
+    console.log(description)
     try {
-            const data = await pool.query(`INSERT INTO public.users_roles (role) VALUES ($1)`, [role], (err)=>{
+            const data = await pool.query(`INSERT INTO public.users_roles (description) VALUES ($1)`, [description], (err)=>{
                 if(err){
+                    console.log(err)
                     res.status(500).json({
                         error: `Error adding role: ${err}`
                     })

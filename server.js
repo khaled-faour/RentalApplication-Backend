@@ -17,7 +17,7 @@ const units = require("./routes/units/units");
 const users = require("./routes/users/users");
 const unitFees = require("./routes/units/unit_fees");
 const lease = require("./routes/leases/leases");
-const payments = require("./routes/payments/payments");
+const receipts = require("./routes/receipts/receipts");
 const leaseFees = require("./routes/leases/lease_fees");
 
 const app = express(); //Initialized express
@@ -64,7 +64,7 @@ app.use("/api/unit_fees", unitFees);
 app.use("/api/users", users)
 app.use("/api/lease", lease);
 app.use("/api/leases/lease_fees", leaseFees);
-app.use("/api/payments", payments);
+app.use("/api/receipts", receipts);
 
 
 

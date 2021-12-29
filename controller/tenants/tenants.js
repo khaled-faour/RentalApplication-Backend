@@ -4,16 +4,7 @@ exports.getTenants = async(req, res)=>{
 
     try {
         const data = await pool.query(
-            `SELECT id, 
-            CONCAT(first_name, ' ', last_name) AS name, 
-            identification_type,
-            user,
-            resident_center_state,
-            text_message_state,
-            (SELECT ARRAY(SELECT email FROM public.tenant_email WHERE tenant_id = public.tenants.id) as emails),
-            (SELECT ARRAY(SELECT phone FROM public.tenant_phone WHERE tenant_id = public.tenants.id) as phones)
-            FROM 
-            public.tenants`);
+            `SELECT * FROM all_tenants`);
         const rows = data.rows;
         if(rows.length === 0){
             res.json({
@@ -36,62 +27,26 @@ exports.addTenant = async(req, res)=>{
     const {firstName, lastName, residentCenterStatus, textMessageStatus, identificationType, user, emails, phones} = req.body
     
     try {
-            const data = await pool.query(
-                `INSERT INTO public.tenants (first_name, last_name,  identification_type, "user", resident_center_state, text_message_state)
-                VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-                [firstName, lastName, identificationType, user, residentCenterStatus, textMessageStatus], (err, result)=>{
+            pool.query(
+                `CALL Add_Tenant($1, $2, $3, $4, $5, $6, $7, $8)`,
+                [
+                    firstName, 
+                    lastName, 
+                    identificationType, 
+                    user, 
+                    residentCenterStatus, 
+                    textMessageStatus, 
+                    JSON.stringify(phones), 
+                    JSON.stringify(emails)
+                ], (err, result)=>{
                 if(err){
-                    console.log(err)
-                    return res.status(500).json({
-                        error: `Error adding Tenant: ${err}`
-                    })
+                    throw err;
+                   
                 }else{
-                    const id = result.rows[0].id
-                    
-                    //INSERT PHONES
-                    var phonesArray = [];
-
-                    phones.map(phone=>{
-                        phonesArray.push(`(${id}, ${phone})`);
+                    return res.status(200).json({
+                        message: `Success`,
+                        result
                     });
-
-                    const phonesString = phonesArray.join(',')
-
-
-                    pool.query(
-                    `INSERT INTO public.tenant_phone (tenant_id, phone)
-                    VALUES ${phonesString}`, [], (err=>{
-                        if(err){
-                            console.log(err);
-                            return res.status(500).json({
-                                error: `Error adding Tenant phones: ${err}`
-                            })
-                        }
-                    })
-                    )
-
-                    //INSERT EMAILS
-                    var emailsArray =[]
-                    emails.map(email=>{
-                        emailsArray.push(`(${id}, '${email}')`)
-                    });
-
-                    const emailsString = emailsArray.join(',')
-                    console.log(emailsString)
-                    pool.query(
-                    `INSERT INTO public.tenant_email (tenant_id, email)
-                    VALUES ${emailsString}`, [], (err=>{
-                        if(err){
-                            console.log(err);
-                            return res.status(500).json({
-                                error: `Error adding Tenant emails: ${err}`
-                            })
-                        }
-                    })
-                    )
-                    res.status(200).json({
-                        message: "Tenant Added!"
-                    })
                 }
             });
         
