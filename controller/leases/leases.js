@@ -24,13 +24,36 @@ exports.getLeases = async(req, res)=>{
     }
 }
 
+exports.getTenantLeases = async(req, res)=>{
+    const {tenant_id} = req.params
+    try {
+        const data = await pool.query(
+            `SELECT * FROM all_leases WHERE tenant_id = ${tenant_id}`);
+        const rows = data.rows;
+        if(rows.length === 0){
+            res.json({
+                message: 'no data'
+            })
+        }else{
+            res.status(200).json(rows)
+        }
+        
+        
+    } catch (error) {
+        console.log('Error:', error);
+        res.status(500).json({
+            error: "Database error occurred while fetching Appliances!", //Database connection error
+        });
+    }
+}
+
 exports.addLease = async(req, res)=>{
 
-    const {unit, tenant,  leaseType, from, to, fees, user, date, guarantee } = req.body
+    const {unit, tenant,  leaseType, from, to, fees, user, date } = req.body
 
     try{
-        pool.query(`CALL Add_Lease($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-            [unit, tenant, leaseType, from, to, user, date, guarantee, JSON.stringify(fees)], (err, result)=>{
+        pool.query(`CALL Add_Lease($1, $2, $3, $4, $5, $6, $7, $8)`,
+            [unit, tenant, leaseType, from, to, user, date, JSON.stringify(fees)], (err, result)=>{
                 if (err) {
                     console.log(err)
                     throw err;
