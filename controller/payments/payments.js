@@ -32,8 +32,9 @@ exports.addPayment = async(req, res)=>{
 
     let amount = 0;
     fees.map((fee, index)=>{
-            amount += fee.price;
+            amount -= fee.price;
             const keys = Object.keys(fee)
+            fees[index]['price'] = -Math.abs(fee.price)
             keys.map(key=>{
                 if(key === 'price' || key === 'fee_id'){
                     return ;
