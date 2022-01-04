@@ -11,15 +11,17 @@ const  user  =  require("./routes/users");
 const test = require("./routes/test");
 const lookups = require("./routes/lookups");
 const tenants = require("./routes/tenants/tenants");
+const tenantLeases = require("./routes/tenants/leases");
+const tenantTransactions = require("./routes/tenants/transactions");
 const projects = require("./routes/projects/projects");
 const properties = require("./routes/properties/properties");
 const units = require("./routes/units/units");
 const users = require("./routes/users/users");
 const unitFees = require("./routes/units/unit_fees");
 const lease = require("./routes/leases/leases");
-const receipts = require("./routes/receipts/receipts");
 const leaseFees = require("./routes/leases/lease_fees");
-const payments = require("./routes/payments/payments")
+const receipts = require("./routes/receipts/receipts");
+const payments = require("./routes/payments/payments");
 
 const app = express(); //Initialized express
 
@@ -58,6 +60,8 @@ app.use("/api/user",  user);  //Route for /user endpoint of API
 app.use("/api/test", test)
 app.use("/api/lookups", lookups)
 app.use("/api/tenants", tenants)
+app.use("/api/tenant/leases", tenantLeases)
+app.use("/api/tenant/transactions", tenantTransactions)
 app.use("/api/projects", projects)
 app.use("/api/properties", properties)
 app.use("/api/units", units)
