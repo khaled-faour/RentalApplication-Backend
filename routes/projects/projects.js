@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 const {authorization} = require('../../middleware/authorization')
-const {getProjects, addProject, editProject, deleteProject} = require('../../controller/projects/projects')
+const {getProjects, getProject, addProject, editProject, deleteProject} = require('../../controller/projects/projects')
 
-router.get('/' ,authorization, getProjects); 
+router.get('/all' ,authorization, getProjects); 
+
+router.get('/', authorization, getProject);
 
 router.post('/' , authorization, addProject); 
 
