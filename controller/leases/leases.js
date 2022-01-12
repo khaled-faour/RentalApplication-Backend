@@ -5,7 +5,7 @@ exports.getLeases = async(req, res)=>{
 
     try {
         const data = await pool.query(
-            `SELECT * FROM all_leases`);
+            `SELECT * FROM combined_leases`);
         const rows = data.rows;
         if(rows.length === 0){
             res.json({

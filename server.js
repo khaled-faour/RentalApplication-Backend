@@ -19,6 +19,8 @@ const units = require("./routes/units/units");
 const users = require("./routes/users/users");
 const unitFees = require("./routes/units/unit_fees");
 const lease = require("./routes/leases/leases");
+const draftLease = require("./routes/leases/draft_leases");
+const activateLease = require("./routes/leases/activate");
 const leaseFees = require("./routes/leases/lease_fees");
 const receipts = require("./routes/receipts/receipts");
 const payments = require("./routes/payments/payments");
@@ -68,6 +70,8 @@ app.use("/api/units", units)
 app.use("/api/unit_fees", unitFees);
 app.use("/api/users", users)
 app.use("/api/lease", lease);
+app.use("/api/leases/draft_leases", draftLease);
+app.use("/api/leases/activate", activateLease);
 app.use("/api/leases/lease_fees", leaseFees);
 app.use("/api/receipts", receipts);
 app.use("/api/payments", payments)
