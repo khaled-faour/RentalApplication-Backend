@@ -6,7 +6,7 @@ exports.getTenantLeases = async(req, res)=>{
     
     try {
         const data = await pool.query(
-            `SELECT * FROM all_leases WHERE tenant_id = ${id}`);
+            `SELECT * FROM combined_leases WHERE tenant_id = ${id}`);
         const rows = data.rows;
         if(rows.length === 0){
             res.json({

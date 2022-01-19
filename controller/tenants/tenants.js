@@ -48,20 +48,19 @@ exports.getTenants = async(req, res)=>{
 }
 
 exports.addTenant = async(req, res)=>{
-    const {firstName, lastName, residentCenterStatus, textMessageStatus, identificationType, user, emails, phones} = req.body
-    
+    const {name, residentCenterStatus, textMessageStatus, identificationType, user, emails, phones} = req.body || null;
+    console.log(req.body);
     try {
             pool.query(
-                `CALL Add_Tenant($1, $2, $3, $4, $5, $6, $7, $8)`,
+                `CALL Add_Tenant($1, $2, $3, $4, $5, $6, $7)`,
                 [
-                    firstName, 
-                    lastName, 
+                    name,
                     identificationType, 
                     user, 
                     residentCenterStatus, 
                     textMessageStatus, 
-                    JSON.stringify(phones), 
-                    JSON.stringify(emails)
+                    phones.join(),
+                    emails.join()
                 ], (err, result)=>{
                 if(err){
                     throw err;
@@ -83,27 +82,41 @@ exports.addTenant = async(req, res)=>{
 }
 
 exports.editTenant = async(req, res)=>{
-    const {id, description} = req.body
-    console.log("ID: ",id, " | ", "Description: ", description)
-    
+    const {id, name, residentCenterStatus, textMessageStatus, identification_type, user, emails, phones} = req.body || null;
+    console.log( id,
+        name,
+        identification_type,
+        user,
+        residentCenterStatus,
+        textMessageStatus,
+        phones.join(),
+        emails.join())
     try {
-        const data = await pool.query(`UPDATE public.appliances SET description = $1 WHERE id = $2`, [description, id], (err, result)=>{
-            if(err){
-                res.status(500).json({
-                    error: `Error updating Appliance: ${err}`
-                })
-            }else{
-                res.status(200).json({
-                    message: "Appliance updated!"
-                })
-            }
-        });
-       
-        
+        // const data = await pool.query(`CALL UPDATE_TENANT($1, $2, $3, $4, $5, $6, $7, $8)`, 
+        // [   id,
+        //     name,
+        //     identification_type,
+        //     user,
+        //     residentCenterStatus,
+        //     textMessageStatus,
+        //     phones.join(),
+        //     emails.join()
+        // ],(err, result)=>{
+        //     if(err){
+        //         console.log("Error: ", err)
+        //         res.status(500).json({
+        //             error: `Error updating Tenant: ${err}`
+        //         })
+        //     }else{
+        //         res.status(200).json({
+        //             message: "Tenant updated!"
+        //         })
+        //     }
+        // });
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({
-            error: "Database error occurred while fetching Appliances!", //Database connection error
+            error: "Database error occurred while updating tenant!", //Database connection error
         });
     }
 }
