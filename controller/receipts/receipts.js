@@ -36,7 +36,7 @@ exports.addReceipt = async(req, res)=>{
             amount += fee.price;
             const keys = Object.keys(fee)
             keys.map(key=>{
-                if(key === 'price' || key === 'fee_id'){
+                if(key === 'price' || key === 'fee_id' || key==='description'){
                     return ;
                 }
                 return delete fees[index][key]

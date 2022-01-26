@@ -32,11 +32,12 @@ exports.addPayment = async(req, res)=>{
 
     let amount = 0;
     fees.map((fee, index)=>{
+            console.log(fee)
             amount -= fee.price;
             const keys = Object.keys(fee)
             fees[index]['price'] = -Math.abs(fee.price)
             keys.map(key=>{
-                if(key === 'price' || key === 'fee_id'){
+                if(key === 'price' || key === 'fee_id' || key==='description'){
                     return ;
                 }
                 return delete fees[index][key]
@@ -44,7 +45,6 @@ exports.addPayment = async(req, res)=>{
     })
     
     try {   
-            
             const data = pool.query(
                 `CALL add_payment($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
                 [amount, paymentDate, orderTo, note, leaseId, paymentType, user, tenantId,JSON.stringify(fees)], (err, result)=>{

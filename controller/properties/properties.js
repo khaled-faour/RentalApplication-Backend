@@ -52,27 +52,25 @@ exports.addProperty = async(req, res)=>{
 }
 
 exports.editProperty = async(req, res)=>{
-    const {id, description} = req.body
-    console.log("ID: ",id, " | ", "Description: ", description)
-    
+    const data = req.body
+    console.log(data)
     try {
-        pool.query(`UPDATE public.appliances SET description = $1 WHERE id = $2`, [description, id], (err, result)=>{
+        pool.query(`CALL update_property($1)`, [data], (err, result)=>{
             if(err){
+                console.log(err)
                 res.status(500).json({
-                    error: `Error updating Appliance: ${err}`
+                    error: `Error updating property: ${err}`
                 })
             }else{
                 res.status(200).json({
-                    message: "Appliance updated!"
+                    message: "Property updated!"
                 })
             }
-        });
-       
-        
+        }); 
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({
-            error: "Database error occurred while fetching Appliances!", //Database connection error
+            error: "Database error occurred while updating property!", //Database connection error
         });
     }
 }
