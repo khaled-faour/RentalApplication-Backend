@@ -1,12 +1,13 @@
 const pool= require("../../configs/database");
+const { map } = require("../../routes/lookups");
 
-exports.getPayments = async(req, res)=>{
+exports.getReceipts = async(req, res)=>{
 
     try {
         const data = await pool.query(
             `SELECT *
             FROM 
-                    all_payments`);
+                    all_receipts`);
         const rows = data.rows;
         if(rows.length === 0){
             res.json({
@@ -25,17 +26,15 @@ exports.getPayments = async(req, res)=>{
     }
 }
 
-exports.addPayment = async(req, res)=>{
-    let {paymentDate, orderTo,  note, lease, paymentType, fees, user} = req.body
+exports.addReceipt = async(req, res)=>{
+    let {paymentDate, receivedFrom,  note, lease, paymentType, fees, user} = req.body
     const leaseId = lease.id;
     const tenantId = lease.tenant_id;
 
     let amount = 0;
     fees.map((fee, index)=>{
-            console.log(fee)
-            amount -= fee.price;
+            amount += fee.price;
             const keys = Object.keys(fee)
-            fees[index]['price'] = -Math.abs(fee.price)
             keys.map(key=>{
                 if(key === 'price' || key === 'fee_id' || key==='description'){
                     return ;
@@ -45,9 +44,11 @@ exports.addPayment = async(req, res)=>{
     })
     
     try {   
+            
+        console.log(req.body)
             const data = pool.query(
-                `CALL add_payment($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-                [amount, paymentDate, orderTo, note, leaseId, paymentType, user, tenantId,JSON.stringify(fees)], (err, result)=>{
+                `CALL add_receipt($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+                [amount, paymentDate, receivedFrom,  note, leaseId, paymentType, user, tenantId, JSON.stringify(fees)], (err, result)=>{
                     if(err) throw err;
                     
                     res.status(200).send("Success")
@@ -61,7 +62,7 @@ exports.addPayment = async(req, res)=>{
     }
 }
 
-exports.editPayment = async(req, res)=>{
+exports.editReceipt = async(req, res)=>{
     const {id, description} = req.body
     console.log("ID: ",id, " | ", "Description: ", description)
     
@@ -87,7 +88,7 @@ exports.editPayment = async(req, res)=>{
     }
 }
 
-exports.deletePayment = async(req, res)=>{
+exports.deleteReceipt = async(req, res)=>{
     const {id} = req.body
     console.log("ID: ",id)
     try {

@@ -5,26 +5,7 @@ exports.getLeases = async(req, res)=>{
 
     try {
         const data = await pool.query(
-            `SELECT 
-                lease.id AS id,
-                lease_from_date,
-                lease_to_date,
-                tenant AS tenant_id,
-                unit,
-                CONCAT(INITCAP(tenant.first_name), ' ', INITCAP(tenant.last_name)) AS tenant,
-                tenant.id AS tenant_id,
-                unit.code AS unit_code,
-                lease_type.description AS type,
-                property.code AS property_code,
-                project.project_name AS project_name,
-                project.id AS project_id
-            FROM 
-                public.leases AS lease
-            JOIN public.tenants AS tenant ON lease.tenant = tenant.id
-            JOIN public.units AS unit ON lease.unit = unit.id
-            JOIN public.lease_types AS lease_type ON lease_type.id = lease.lease_type
-            JOIN public.properties AS property ON property.id = unit.property_id
-            JOIN public.projects AS project ON property.project_id = project.id`);
+            `SELECT * FROM combined_leases`);
         const rows = data.rows;
         if(rows.length === 0){
             res.json({
@@ -41,12 +22,13 @@ exports.getLeases = async(req, res)=>{
     }
 }
 
-exports.getLeaseById = async(req, res) => {
-    const {tenant_id} = req.query
+
+exports.getTenantLeases = async(req, res)=>{
+    const {tenant_id} = req.params
     try {
         const data = await pool.query(
-            `SELECT DISTINCT id, lease_type  FROM public.leases
-             WHERE tenant = ${tenant_id}`);
+            `SELECT * FROM active_leases WHERE tenant_id = ${tenant_id}`);
+
         const rows = data.rows;
         if(rows.length === 0){
             res.json({
@@ -66,93 +48,26 @@ exports.getLeaseById = async(req, res) => {
 
 exports.addLease = async(req, res)=>{
 
-    const {unit, tenant,  leaseType, from, to, fees, user } = req.body
-
-
-    //Calculate Months Difference
-    const monthsDiff = () =>{
-    let months;
-    d1 = new Date(from);
-    d2 = new Date(to);
-    months = (d2.getFullYear() - d1.getFullYear()) * 12;
-    months -= d1.getMonth();
-    months += d2.getMonth();
-    return months;
-    }
-        
+    const {unit, tenant,  leaseType, from, to, fees, user, date } = req.body
 
     try{
-
-
-
-        
-        //ADD Lease Query
-        const res = await pool.query( 
-            `INSERT INTO public.leases (unit, tenant, lease_type, lease_from_date, lease_to_date, "user") 
-        VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-        [unit, tenant, leaseType, from, to, user],
-        async (err, result)=>{
-            if(err) throw err
-
-
-            //SET Unit Occupied
-            pool.query(`UPDATE public.units SET occupancy_status = ${true} WHERE id = ${unit}`,
-            (err)=>{
-                if(err) throw err
-            })
-            
-           
-            //Add Lease fees
-            fees.map(async fee=>{
-                //Fetch Cycle
-                const cycle = await pool.query(`SELECT months FROM public.cycles WHERE id = ${fee.cycle}`)
-                console.log("cycle: ", cycle)
-                for(let i=0; i<(monthsDiff()/(cycle.rows[0].months)); i++){
-                    pool.query(
-                        `INSERT INTO
-                        public.lease_fees (lease_id, fee_id, cycle, price)
-                        VALUES (${result.rows[0].id}, ${fee.fee_id}, ${fee.cycle}, ${fee.price})`, (err, result)=>{
-                            if(err) throw err;
-                        })
+        pool.query(`CALL Add_Lease($1, $2, $3, $4, $5, $6, $7, $8)`,
+            [unit, tenant, leaseType, from, to, user, date, JSON.stringify(fees)], (err, result)=>{
+                if (err) {
+                    console.log(err)
+                    throw err;
                 }
-            })
-
-        })
-
+                res.status(200).send("Success")
+            });
+        console.log(req.body)
 
     } catch (e){
-        try {
-            pool.query('ROLLBACK');
-        } catch (rollbackError) {
-            console.log("Rollback Error: ", rollbackError)
-        }
         console.log("An Error Occured: ", e);
-        return e;
+        return res.status(500).send("Error: ", e);
     }finally{
-        res.status(200).send("Success")
-    }
-    // try {
-    //         const data = await pool.query(
-    //             `INSERT INTO public.projects (number, project_name,  region, country, city, street)
-    //             VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-    //             [number, name,  region, country, city, street], (err, result)=>{
-    //                 if(err){
-    //                     res.status(500).json({
-    //                         error: `Error adding project: ${err}`
-    //                     })
-    //                 }else{
-    //                     res.status(200).json({
-    //                         message: "Project Added!"
-    //                     })
-    //                 }
-    //         });
         
-    // } catch (error) {
-    //     console.log('Error:', error);
-    //     res.status(500).json({
-    //         error: "Database error occurred while adding Project!", 
-    //     });
-    // }
+    }
+    
 }
 
 exports.editLease = async(req, res)=>{

@@ -4,6 +4,8 @@ const  client  =  require("../configs/database");
 
 const  jwt  =  require("jsonwebtoken");
 
+const pool = require("../configs/database");
+
 //Registration Function
 
 exports.register  =  async (req, res) => {

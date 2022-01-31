@@ -1,19 +1,11 @@
 const pool= require("../../configs/database");
 
-exports.getTenants = async(req, res)=>{
 
+exports.getTenant = async(req, res)=>{
+    const {id} = req.query;
     try {
         const data = await pool.query(
-            `SELECT id, 
-            CONCAT(first_name, ' ', last_name) AS name, 
-            identification_type,
-            user,
-            resident_center_state,
-            text_message_state,
-            (SELECT ARRAY(SELECT email FROM public.tenant_email WHERE tenant_id = public.tenants.id) as emails),
-            (SELECT ARRAY(SELECT phone FROM public.tenant_phone WHERE tenant_id = public.tenants.id) as phones)
-            FROM 
-            public.tenants`);
+            `SELECT * FROM all_tenants WHERE id = ${id}`);
         const rows = data.rows;
         if(rows.length === 0){
             res.json({
@@ -27,71 +19,57 @@ exports.getTenants = async(req, res)=>{
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({
-            error: "Database error occurred while fetching Appliances!", //Database connection error
+            error: "Database error occurred while fetching Tenant!", //Database connection error
+        });
+    }
+}
+
+exports.getTenants = async(req, res)=>{
+
+    try {
+        const data = await pool.query(
+            `SELECT * FROM all_tenants`);
+        const rows = data.rows;
+        if(rows.length === 0){
+            res.json({
+                message: 'no data'
+            })
+        }else{
+            res.status(200).json(rows)
+        }
+        
+        
+    } catch (error) {
+        console.log('Error:', error);
+        res.status(500).json({
+            error: "Database error occurred while fetching Tenants!", //Database connection error
         });
     }
 }
 
 exports.addTenant = async(req, res)=>{
-    const {firstName, lastName, residentCenterStatus, textMessageStatus, identificationType, user, emails, phones} = req.body
-    
+    const {name, residentCenterStatus, textMessageStatus, identificationType, user, emails, phones} = req.body || null;
+    console.log(req.body);
     try {
-            const data = await pool.query(
-                `INSERT INTO public.tenants (first_name, last_name,  identification_type, "user", resident_center_state, text_message_state)
-                VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-                [firstName, lastName, identificationType, user, residentCenterStatus, textMessageStatus], (err, result)=>{
+            pool.query(
+                `CALL Add_Tenant($1, $2, $3, $4, $5, $6, $7)`,
+                [
+                    name,
+                    identificationType, 
+                    user, 
+                    residentCenterStatus, 
+                    textMessageStatus, 
+                    phones.join(),
+                    emails.join()
+                ], (err, result)=>{
                 if(err){
-                    console.log(err)
-                    return res.status(500).json({
-                        error: `Error adding Tenant: ${err}`
-                    })
+                    throw err;
+                   
                 }else{
-                    const id = result.rows[0].id
-                    
-                    //INSERT PHONES
-                    var phonesArray = [];
-
-                    phones.map(phone=>{
-                        phonesArray.push(`(${id}, ${phone})`);
+                    return res.status(200).json({
+                        message: `Success`,
+                        result
                     });
-
-                    const phonesString = phonesArray.join(',')
-
-
-                    pool.query(
-                    `INSERT INTO public.tenant_phone (tenant_id, phone)
-                    VALUES ${phonesString}`, [], (err=>{
-                        if(err){
-                            console.log(err);
-                            return res.status(500).json({
-                                error: `Error adding Tenant phones: ${err}`
-                            })
-                        }
-                    })
-                    )
-
-                    //INSERT EMAILS
-                    var emailsArray =[]
-                    emails.map(email=>{
-                        emailsArray.push(`(${id}, '${email}')`)
-                    });
-
-                    const emailsString = emailsArray.join(',')
-                    console.log(emailsString)
-                    pool.query(
-                    `INSERT INTO public.tenant_email (tenant_id, email)
-                    VALUES ${emailsString}`, [], (err=>{
-                        if(err){
-                            console.log(err);
-                            return res.status(500).json({
-                                error: `Error adding Tenant emails: ${err}`
-                            })
-                        }
-                    })
-                    )
-                    res.status(200).json({
-                        message: "Tenant Added!"
-                    })
                 }
             });
         
@@ -104,27 +82,33 @@ exports.addTenant = async(req, res)=>{
 }
 
 exports.editTenant = async(req, res)=>{
-    const {id, description} = req.body
-    console.log("ID: ",id, " | ", "Description: ", description)
-    
+    const {id, name, residentCenterStatus, textMessageStatus, identification_type, user, emails, phones} = req.body || null;
     try {
-        const data = await pool.query(`UPDATE public.appliances SET description = $1 WHERE id = $2`, [description, id], (err, result)=>{
+        const data = await pool.query(`CALL UPDATE_TENANT($1, $2, $3, $4, $5, $6, $7, $8)`, 
+        [   id,
+            name,
+            identification_type,
+            user,
+            residentCenterStatus,
+            textMessageStatus,
+            phones.join(),
+            emails.join()
+        ],(err, result)=>{
             if(err){
+                console.log("Error: ", err)
                 res.status(500).json({
-                    error: `Error updating Appliance: ${err}`
+                    error: `Error updating Tenant: ${err}`
                 })
             }else{
                 res.status(200).json({
-                    message: "Appliance updated!"
+                    message: "Tenant updated!"
                 })
             }
         });
-       
-        
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({
-            error: "Database error occurred while fetching Appliances!", //Database connection error
+            error: "Database error occurred while updating tenant!", //Database connection error
         });
     }
 }

@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 
 const regions = require('./regions');
+const countries = require('./countries');
 const cities = require('./cities');
 const states = require('./states');
 const fees = require('./fees');
@@ -17,8 +18,13 @@ const exchanges = require('./exchange')
 
 
 app.use('/regions', regions);
+
 app.use('/appliances', appliances);
+
+app.use('/countries', countries);
+
 app.use('/cities', cities);
+app.use('/appliances', appliances)
 app.use('/states', states);
 app.use('/fees', fees);
 app.use('/propertyTypes', propertyTypes);
