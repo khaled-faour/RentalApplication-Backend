@@ -23,6 +23,9 @@ const lease = require("./routes/leases/leases");
 const draftLease = require("./routes/leases/draft_leases");
 const activateLease = require("./routes/leases/activate");
 const leaseFees = require("./routes/leases/lease_fees");
+
+const checkInOut = require("./routes/checkin-out/checkin-out")
+
 const receipts = require("./routes/receipts/receipts");
 const payments = require("./routes/payments/payments");
 const aggregations = require("./routes/aggregations/index");
@@ -64,8 +67,10 @@ app.use("/api/user",  user);  //Route for /user endpoint of API
 app.use("/api/test", test);
 app.use("/api/lookups", lookups);
 app.use("/api/tenants", tenants);
+
 app.use("/api/tenant/leases", tenantLeases);
 app.use("/api/tenant/transactions", tenantTransactions);
+
 app.use("/api/projects", projects);
 app.use("/api/properties", properties);
 app.use("/api/units", units);
@@ -78,8 +83,10 @@ app.use("/api/leases/activate", activateLease);
 app.use("/api/leases/lease_fees", leaseFees);
 app.use("/api/receipts", receipts);
 app.use("/api/payments", payments);
-app.use("/api/aggregations", aggregations);
 
+app.use("/api/checkInOut", checkInOut);
+
+app.use("/api/aggregations", aggregations);
 
 
 app.listen(port, (err) => {
@@ -91,11 +98,7 @@ app.listen(port, (err) => {
     }
 })
 
-
-
-
 pool.connect((err) => { 
-
     //Connected Database
     if (err) {
         console.log(err);
