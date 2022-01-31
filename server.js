@@ -19,6 +19,8 @@ const unitFees = require("./routes/units/unit_fees");
 const lease = require("./routes/leases/leases");
 const payments = require("./routes/payments/payments");
 const leaseFees = require("./routes/leases/lease_fees");
+const checkInOut = require("./routes/checkin-out/checkin-out")
+
 const app = express(); //Initialized express
 
 app.use(cookieParser())
@@ -64,6 +66,7 @@ app.use("/api/users", users);
 app.use("/api/lease", lease);
 app.use("/api/leases/lease_fees", leaseFees);
 app.use("/api/payments", payments);
+app.use("/api/checkInOut", checkInOut);
 
 app.listen(port, (err) => {
     if(err){

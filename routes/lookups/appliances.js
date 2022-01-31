@@ -6,7 +6,7 @@ const {getAppliances, addAppliance, editAppliance, deleteAppliance} = require('.
 
 router.get('/' ,authorization, getAppliances); 
 
-router.post('/' , authorization, addAppliance); 
+router.post('/' , authorization, addAppliance);
 
 router.put('/' , authorization, editAppliance); 
 

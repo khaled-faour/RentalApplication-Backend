@@ -33,8 +33,6 @@ exports.getLeases = async(req, res)=>{
         }else{
             res.status(200).json(rows)
         }
-        
-        
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({
@@ -42,6 +40,29 @@ exports.getLeases = async(req, res)=>{
         });
     }
 }
+
+exports.getLeaseById = async(req, res) => {
+    const {tenant_id} = req.query
+    try {
+        const data = await pool.query(
+            `SELECT DISTINCT id, lease_type  FROM public.leases
+             WHERE tenant = ${tenant_id}`);
+        const rows = data.rows;
+        if(rows.length === 0){
+            res.json({
+                message: 'no data'
+            })
+        }else{
+            res.status(200).json(rows)
+        } 
+    } catch (error) {
+        console.log('Error:', error);
+        res.status(500).json({
+            error: "Database error occurred while fetching Lease_fees!", //Database connection error
+        });
+    }
+}
+
 
 exports.addLease = async(req, res)=>{
 

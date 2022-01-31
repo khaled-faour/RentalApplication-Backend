@@ -10,15 +10,15 @@ const {addCurrency} = require('../../controller/lookups/currency');
 
 const {editCurrency} = require('../../controller/lookups/currency');
 
-const {deleteCurrency} = require('../../controller/lookups/currency')
+const {deleteCurrency} = require('../../controller/lookups/currency');
 
-router.get('/' , getAllCurrency);
+router.get('/', /* authorization, */ getAllCurrency);
 
-router.post('/' , addCurrency);
+router.post('/' ,/* authorization, */ addCurrency);
 
-router.put('/' , editCurrency);
+router.put('/' ,/* authorization, */ editCurrency);
 
-router.delete('/' , deleteCurrency);
+router.delete('/' ,/* authorization, */ deleteCurrency);
 
 
 
