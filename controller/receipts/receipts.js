@@ -1,11 +1,13 @@
-const { Client } = require("pg");
 const pool= require("../../configs/database");
+const { map } = require("../../routes/lookups");
 
-exports.getLeases = async(req, res)=>{
+exports.getReceipts = async(req, res)=>{
 
     try {
         const data = await pool.query(
-            `SELECT * FROM combined_leases`);
+            `SELECT *
+            FROM 
+                    all_receipts`);
         const rows = data.rows;
         if(rows.length === 0){
             res.json({
@@ -24,54 +26,43 @@ exports.getLeases = async(req, res)=>{
     }
 }
 
-exports.getTenantLeases = async(req, res)=>{
-    const {tenant_id} = req.params
-    try {
-        const data = await pool.query(
-            `SELECT * FROM active_leases WHERE tenant_id = ${tenant_id}`);
-        const rows = data.rows;
-        if(rows.length === 0){
-            res.json({
-                message: 'no data'
-            })
-        }else{
-            res.status(200).json(rows)
-        }
-        
-        
-    } catch (error) {
-        console.log('Error:', error);
-        res.status(500).json({
-            error: "Database error occurred while fetching Appliances!", //Database connection error
-        });
-    }
-}
+exports.addReceipt = async(req, res)=>{
+    let {paymentDate, receivedFrom,  note, lease, paymentType, fees, user} = req.body
+    const leaseId = lease.id;
+    const tenantId = lease.tenant_id;
 
-exports.addLease = async(req, res)=>{
-
-    const {unit, tenant,  leaseType, from, to, fees, user, date } = req.body
-
-    try{
-        pool.query(`CALL Add_Lease($1, $2, $3, $4, $5, $6, $7, $8)`,
-            [unit, tenant, leaseType, from, to, user, date, JSON.stringify(fees)], (err, result)=>{
-                if (err) {
-                    console.log(err)
-                    throw err;
+    let amount = 0;
+    fees.map((fee, index)=>{
+            amount += fee.price;
+            const keys = Object.keys(fee)
+            keys.map(key=>{
+                if(key === 'price' || key === 'fee_id' || key==='description'){
+                    return ;
                 }
-                res.status(200).send("Success")
-            });
-        console.log(req.body)
-
-    } catch (e){
-        console.log("An Error Occured: ", e);
-        return res.status(500).send("Error: ", e);
-    }finally{
-        
-    }
+                return delete fees[index][key]
+            })
+    })
     
+    try {   
+            
+        console.log(req.body)
+            const data = pool.query(
+                `CALL add_receipt($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+                [amount, paymentDate, receivedFrom,  note, leaseId, paymentType, user, tenantId, JSON.stringify(fees)], (err, result)=>{
+                    if(err) throw err;
+                    
+                    res.status(200).send("Success")
+            })
+        
+    } catch (error) {
+        console.log('Error:', error);
+        res.status(500).json({
+            error: "Database error occurred while adding Payment!", 
+        });
+    }
 }
 
-exports.editLease = async(req, res)=>{
+exports.editReceipt = async(req, res)=>{
     const {id, description} = req.body
     console.log("ID: ",id, " | ", "Description: ", description)
     
@@ -97,7 +88,7 @@ exports.editLease = async(req, res)=>{
     }
 }
 
-exports.deleteLease = async(req, res)=>{
+exports.deleteReceipt = async(req, res)=>{
     const {id} = req.body
     console.log("ID: ",id)
     try {

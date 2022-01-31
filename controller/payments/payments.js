@@ -1,5 +1,4 @@
 const pool= require("../../configs/database");
-const { map } = require("../../routes/lookups");
 
 exports.getPayments = async(req, res)=>{
 
@@ -7,7 +6,7 @@ exports.getPayments = async(req, res)=>{
         const data = await pool.query(
             `SELECT *
             FROM 
-                    public.payments`);
+                    all_payments`);
         const rows = data.rows;
         if(rows.length === 0){
             res.json({
@@ -27,31 +26,32 @@ exports.getPayments = async(req, res)=>{
 }
 
 exports.addPayment = async(req, res)=>{
-    const {paymentDate, receivedFrom,  note, lease, paymentType, fees, user} = req.body
+    let {paymentDate, orderTo,  note, lease, paymentType, fees, user} = req.body
     const leaseId = lease.id;
     const tenantId = lease.tenant_id;
+
     let amount = 0;
-    fees.map(fee=>{
-        amount += fee.price;
+    fees.map((fee, index)=>{
+            console.log(fee)
+            amount -= fee.price;
+            const keys = Object.keys(fee)
+            fees[index]['price'] = -Math.abs(fee.price)
+            keys.map(key=>{
+                if(key === 'price' || key === 'fee_id' || key==='description'){
+                    return ;
+                }
+                return delete fees[index][key]
+            })
     })
     
     try {   
-            console.log(req.body)
-            const data = await pool.query(
-                `INSERT INTO public.payments (amount, payment_date, received_from, notes, lease_id, payment_type, "user", tenant_id)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-                [amount, paymentDate, receivedFrom,  note, leaseId, paymentType, user, tenantId], (err, result)=>{
-                    if(err){
-                        console.log(err)
-                        res.status(500).json({
-                            error: `Error adding payment: ${err}`
-                        })
-                    }else{
-                        res.status(200).json({
-                            message: "Payment Added!"
-                        })
-                    }
-            });
+            const data = pool.query(
+                `CALL add_payment($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+                [amount, paymentDate, orderTo, note, leaseId, paymentType, user, tenantId,JSON.stringify(fees)], (err, result)=>{
+                    if(err) throw err;
+                    
+                    res.status(200).send("Success")
+            })
         
     } catch (error) {
         console.log('Error:', error);

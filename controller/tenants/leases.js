@@ -1,21 +1,18 @@
 const pool= require("../../configs/database");
 
-exports.getUnitFees = async(req, res)=>{
 
-    const unitId = req.query.unitId
+exports.getTenantLeases = async(req, res)=>{
+    const {id} = req.query;
+    
     try {
         const data = await pool.query(
-            `SELECT *
-            FROM all_fees
-            WHERE unit_id = $1
-            `, [unitId]);
+            `SELECT * FROM combined_leases WHERE tenant_id = ${id}`);
         const rows = data.rows;
         if(rows.length === 0){
             res.json({
                 message: 'no data'
             })
         }else{
-            console.log(rows)
             res.status(200).json(rows)
         }
         
@@ -23,8 +20,7 @@ exports.getUnitFees = async(req, res)=>{
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({
-            error: "Database error occurred while fetching unit fees!", //Database connection error
+            error: "Database error occurred while fetching Appliances!", //Database connection error
         });
     }
 }
-
