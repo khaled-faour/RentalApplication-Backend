@@ -101,26 +101,26 @@ exports.editLease = async(req, res)=>{
 }
 
 exports.deleteLease = async(req, res)=>{
-    const {id} = req.body
-    console.log("ID: ",id)
+    const {lease_id} = req.body
     try {
-        const data = await pool.query(`DELETE FROM public.projects WHERE id = $1 RETURNING *`, [id], (err, result)=>{
-            if(err){
-                res.status(500).json({
-                    error: `Error deleting project: ${err}`
-                })
-            }else{
-                res.status(200).json({
-                    message: "Project DELETED!"
-                })
-            }
-        });
-       
+        const data = await pool.query(
+            `SELECT delete_draft_lease($1)`, [lease_id],
+            (err, result)=>{
+                if(err){
+                    throw err;
+                }
+                else{
+                    res.status(200).json({
+                        result: result.rows[0]['delete_draft_lease']
+                    })
+                }
+            });
+        
         
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({
-            error: "Database error occurred while deleting projects!", //Database connection error
+            error: "Database error occurred while deleting lease!", //Database connection error
         });
     }
 }
