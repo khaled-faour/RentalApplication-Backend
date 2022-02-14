@@ -4,15 +4,15 @@ const router = express.Router();
 const {authorization} = require('../../middleware/authorization')
 const {getTenants, getTenant, addTenant, editTenant, deleteTenant} = require('../../controller/tenants/tenants')
 
-router.get('/all' ,authorization, getTenants); 
+router.get('/all' ,(req,res,next)=>authorization(req,res,next, 'tenants'), getTenants); 
 
-router.get('/', authorization, getTenant)
+router.get('/', (req,res,next)=>authorization(req,res,next, 'tenants'), getTenant)
 
-router.post('/' , authorization, addTenant); 
+router.post('/' , (req,res,next)=>authorization(req,res,next, 'tenants'), addTenant); 
 
-router.put('/' , authorization, editTenant); 
+router.put('/' , (req,res,next)=>authorization(req,res,next, 'tenants'), editTenant); 
 
-router.delete('/', authorization, deleteTenant);
+router.delete('/', (req,res,next)=>authorization(req,res,next, 'tenants'), deleteTenant);
 
 module.exports = router;
     

@@ -28,7 +28,6 @@ exports.getProject = async(req, res)=>{
 
 
 exports.getProjects = async(req, res)=>{
-
     try {
         const data = await pool.query(
             `SELECT *

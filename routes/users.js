@@ -6,7 +6,9 @@ const {register} = require("../controller/register");
 
 const {login} = require("../controller/login");
 
-router.post('/register' , register); //POST request to register the user
+const {authorization} = require("../middleware/authorization")
+
+router.post('/register', authorization, register); //POST request to register the user
 
 router.post('/login' , login); // POST request to login the user
 

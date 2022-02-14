@@ -4,13 +4,13 @@ const router = express.Router();
 const {authorization} = require('../../middleware/authorization')
 const {getUnits, getUnOccupiedUnits, addUnit, deleteUnit, updateUnit} = require('../../controller/units/units')
 
-router.get('/', authorization, getUnits); 
-router.get('/un-occupied', authorization, getUnOccupiedUnits); 
+router.get('/', (req,res,next)=>authorization(req,res,next, 'units'), getUnits); 
+router.get('/un-occupied', (req,res,next)=>authorization(req,res,next, 'units'), getUnOccupiedUnits); 
 
-router.post('/', authorization, addUnit);
+router.post('/', (req,res,next)=>authorization(req,res,next, 'units'), addUnit);
 
-router.delete('/', authorization, deleteUnit);
+router.delete('/', (req,res,next)=>authorization(req,res,next, 'units'), deleteUnit);
 
-router.put('/', authorization, updateUnit);
+router.put('/', (req,res,next)=>authorization(req,res,next, 'units'), updateUnit);
 
 module.exports = router;

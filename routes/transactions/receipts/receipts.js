@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-const {authorization} = require('../../middleware/authorization')
-const {getReceipts, addReceipt, editReceipt, deleteReceipt} = require('../../controller/receipts/receipts')
+const {authorization} = require('../../../middleware/authorization')
+const {getReceipts, addReceipt, editReceipt, deleteReceipt} = require('../../../controller/transactions/receipts/receipts')
 
 router.get('/' ,authorization, getReceipts); 
 

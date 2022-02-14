@@ -23,8 +23,7 @@ const lease = require("./routes/leases/leases");
 const draftLease = require("./routes/leases/draft_leases");
 const activateLease = require("./routes/leases/activate");
 const leaseFees = require("./routes/leases/lease_fees");
-const receipts = require("./routes/receipts/receipts");
-const payments = require("./routes/payments/payments");
+const transactions = require("./routes/transactions");
 const aggregations = require("./routes/aggregations/index");
 
 const app = express(); //Initialized express
@@ -61,7 +60,6 @@ app.post("/api/validate-token", (req, res)=>{
 })
 
 app.use("/api/user",  user);  //Route for /user endpoint of API
-app.use("/api/test", test);
 app.use("/api/lookups", lookups);
 app.use("/api/tenants", tenants);
 app.use("/api/tenant/leases", tenantLeases);
@@ -76,8 +74,7 @@ app.use("/api/lease", lease);
 app.use("/api/leases/draft_leases", draftLease);
 app.use("/api/leases/activate", activateLease);
 app.use("/api/leases/lease_fees", leaseFees);
-app.use("/api/receipts", receipts);
-app.use("/api/payments", payments);
+app.use("/api/transactions", transactions);
 app.use("/api/aggregations", aggregations);
 
 

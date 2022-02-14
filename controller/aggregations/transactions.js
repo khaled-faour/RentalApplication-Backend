@@ -23,3 +23,9 @@ exports.recentTransactions = (req,res)=>{
         res.status(200).json(result.rows);
     })
 }
+
+exports.recentVoidedTransactions = (req,res)=>{
+    pool.query('SELECT * FROM all_transactions WHERE "isVoid" IS TRUE ORDER BY payment_date DESC LIMIT 5', (err,result)=>{
+        res.status(200).json(result.rows);
+    })
+}
