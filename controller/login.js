@@ -41,7 +41,7 @@ exports.login = async (req, res) => {
                                     { expiresIn: "5h" }
                                 );
                             }
-                        res.cookie('auth', token, {httpOnly: true}).status(200).json({
+                        res.cookie('auth', token, {httpOnly: false}).status(200).json({
                             status: 200,
                             token: token,
                             ...jwt.decode(token)
