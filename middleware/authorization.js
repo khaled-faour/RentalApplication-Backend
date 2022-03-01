@@ -11,7 +11,6 @@ const rolecheck = (req, res, path) => {
     const role = data.role;
 
     if(ROLES[role][req.method].includes(path)){
-      console.log(`[${role}] : ALLOWED ON METHOD ***${req.method}***`)
       return true;
     }
     return false;
@@ -28,9 +27,7 @@ exports.authorization = (req, res, next, path) => {
       return res.sendStatus(403);
     }
     try {
-      console.log("AUTHENTICAED")
       const isAuthorized = path !== null ? rolecheck(req,res,path) : true;
-      console.log("Authorized: ", isAuthorized)
       if(isAuthorized){
         const data = jwt.verify(token, process.env.SECRET_KEY);
         req.userId = data.userId;

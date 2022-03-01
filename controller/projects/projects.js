@@ -1,4 +1,6 @@
 const pool= require("../../configs/database");
+const { response } = require("../../routes/lookups");
+const { uploadFiles, deleteFiles } = require("../files");
 
 exports.getProject = async(req, res)=>{
 
@@ -51,21 +53,23 @@ exports.getProjects = async(req, res)=>{
 }
 
 exports.addProject = async(req, res)=>{
-    const {number, name,  region, country, city, street} = req.body
-    
+    const {number, name,  region, country, city, street, files = []} = req.body
+    var filesArray = [];
+    var filesNames = [];
     try {
-        console.log()
+
         const data = await pool.query(
             `CALL add_project ($1, $2, $3, $4, $5, $6)`,
             [number, name,  region, country, city, street], (err, result)=>{
                 if(err) throw err
                 res.status(200).json({
                     message: "Project Added!"
-                })
+                });
         });
         
     } catch (error) {
         console.log('Error:', error);
+        deleteFiles(filesNames, 'projects')
         res.status(500).json({
             error: "Database error occurred while adding Project!", 
         });

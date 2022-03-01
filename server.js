@@ -2,8 +2,26 @@ const express  =  require("express");
 const cors = require('cors')
 const jwt = require("jsonwebtoken")
 const cookieParser = require('cookie-parser')
+const fileUpload = require("express-fileupload");
+
+
 require('dotenv').config()
 require("./configs/dotenv");
+
+const app = express(); //Initialized express
+
+const http = require('http');
+const server = http.createServer(app);
+const socketio = require("socket.io");
+const { createAdapter } = require("@socket.io/postgres-adapter");
+const io = socketio(server,{
+    cors: {
+        origin: '*',
+      }
+});
+
+
+
 
 const pool = require('./configs/database')
 
@@ -25,11 +43,13 @@ const activateLease = require("./routes/leases/activate");
 const leaseFees = require("./routes/leases/lease_fees");
 const transactions = require("./routes/transactions");
 const aggregations = require("./routes/aggregations/index");
+const files = require("./routes/files");
 
-const app = express(); //Initialized express
 
 app.use(cookieParser())
-app.use(express.json());
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({limit: '50mb'}));
+app.use(fileUpload())
 
 var corsOptions = {
     origin: 'http://localhost:3000'
@@ -76,21 +96,42 @@ app.use("/api/leases/activate", activateLease);
 app.use("/api/leases/lease_fees", leaseFees);
 app.use("/api/transactions", transactions);
 app.use("/api/aggregations", aggregations);
+app.use("/api/files", files);
 
 
+
+io.on('connection', (socket) => {
+    console.log(`[connected]: ${socket.id}`);
+    socket.emit('connection', null)
+    socket.on('Disconnect', (socket)=>{
+        console.log(`user disconneted: ${socket.id}`)
+    })
+  });
+  
+
+// server.listen(port, (err) => {
+//     if(err){
+//         console.log("Error setup server: ", err)
+//     }
+//     else{
+//         console.log(`Here we go, Engines started at ${port}.`);
+//     }
+// })
+
+
+
+// io.adapter(createAdapter(pool),()=>{
+//     console.log("TEST")
+// })
 
 app.listen(port, (err) => {
-    if(err){
-        console.log("Error setup server: ", err)
-    }
-    else{
-        console.log(`Here we go, Engines started at ${port}.`);
-    }
-})
-
-
-
-
+        if(err){
+            console.log("Error setup server: ", err)
+        }
+        else{
+            console.log(`Here we go, Engines started at ${port}.`);
+        }
+    })
 pool.connect((err) => { 
 
     //Connected Database
