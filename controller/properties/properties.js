@@ -1,6 +1,35 @@
 const { json } = require("express");
 const pool= require("../../configs/database");
 
+
+exports.getPropertyUnits = async(req, res)=>{
+    const {id} = req.params;
+
+    try {
+        const data = await pool.query(
+            `SELECT *
+             FROM 
+                public.all_units
+             WHERE property_id = ${id}
+             `);
+        const rows = data.rows;
+        if(rows.length === 0){
+            res.json({
+                message: 'no data'
+            })
+        }else{
+            res.status(200).json(rows)
+        }
+        
+        
+    } catch (error) {
+        console.log('Error:', error);
+        res.status(500).json({
+            error: "Database error occurred while fetching units!", //Database connection error
+        });
+    }
+}
+
 exports.getProperties = async(req, res)=>{
 
     //code, type, project, country, city, street, floore, contact
@@ -76,26 +105,25 @@ exports.editProperty = async(req, res)=>{
 }
 
 exports.deleteProperty = async(req, res)=>{
-    const {id} = req.body
-    console.log("ID: ",id)
+    const {property_id} = req.body
     try {
-
-        pool.query(`DELETE FROM public.properties WHERE id = $1 RETURNING *`, [id], (err, result)=>{
-            if(err){
-                res.status(500).json({
-                    error: `Error deleting property: ${err}`
-                })
-            }else{
-                res.status(200).json({
-                    message: "Property DELETED!"
-                })
-            }
-        });
-       
+        const data = await pool.query(
+            `SELECT delete_property($1)`, [property_id],
+            (err, result)=>{
+                if(err){
+                    throw err;
+                }
+                else{
+                    res.status(200).json({
+                        result: result.rows[0]['delete_property']
+                    })
+                }
+            });
+        
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({
-            error: "Database error occurred while deleting properties!", //Database connection error
+            error: "Database error occurred while deleting property!", //Database connection error
         });
     }
 }

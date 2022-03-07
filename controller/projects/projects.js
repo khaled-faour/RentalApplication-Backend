@@ -1,4 +1,6 @@
 const pool= require("../../configs/database");
+const { response } = require("../../routes/lookups");
+const { uploadFiles, deleteFiles } = require("../files");
 
 exports.getProject = async(req, res)=>{
 
@@ -28,7 +30,6 @@ exports.getProject = async(req, res)=>{
 
 
 exports.getProjects = async(req, res)=>{
-
     try {
         const data = await pool.query(
             `SELECT *
@@ -52,21 +53,23 @@ exports.getProjects = async(req, res)=>{
 }
 
 exports.addProject = async(req, res)=>{
-    const {number, name,  region, country, city, street} = req.body
-    
+    const {number, name,  region, country, city, street, files = []} = req.body
+    var filesArray = [];
+    var filesNames = [];
     try {
-        console.log()
+
         const data = await pool.query(
             `CALL add_project ($1, $2, $3, $4, $5, $6)`,
             [number, name,  region, country, city, street], (err, result)=>{
                 if(err) throw err
                 res.status(200).json({
                     message: "Project Added!"
-                })
+                });
         });
         
     } catch (error) {
         console.log('Error:', error);
+        deleteFiles(filesNames, 'projects')
         res.status(500).json({
             error: "Database error occurred while adding Project!", 
         });
@@ -75,13 +78,13 @@ exports.addProject = async(req, res)=>{
 
 exports.editProject = async(req, res)=>{
 
-    const {city, country, id, name, number, region, street} = req.body
+    const {city_id, country_id, id, name, number, region_id, street} = req.body
 
-    console.log("UPDATING: ", req.body)
     
     try {
-        const data = await pool.query(`CALL UPDATE_PROJECT($1, $2, $3, $4, $5, $6, $7)`, [id, name, region, number, country, street, city], (err, result)=>{
+        const data = await pool.query(`CALL UPDATE_PROJECT($1, $2, $3, $4, $5, $6, $7)`, [id, name, region_id, number, country_id, street, city_id], (err, result)=>{
             if(err){
+                console.log(err)
                 res.status(500).json({
                     error: `Error updating project: ${err}`
                 })
@@ -100,26 +103,25 @@ exports.editProject = async(req, res)=>{
 }
 
 exports.deleteProject = async(req, res)=>{
-    const {id} = req.body
-    console.log("ID: ",id)
+    const {project_id} = req.body
     try {
-        const data = await pool.query(`DELETE FROM public.projects WHERE id = $1 RETURNING *`, [id], (err, result)=>{
-            if(err){
-                res.status(500).json({
-                    error: `Error deleting project: ${err}`
-                })
-            }else{
-                res.status(200).json({
-                    message: "Project DELETED!"
-                })
-            }
-        });
-       
+        const data = await pool.query(
+            `SELECT delete_project($1)`, [project_id],
+            (err, result)=>{
+                if(err){
+                    throw err;
+                }
+                else{
+                    res.status(200).json({
+                        result: result.rows[0]['delete_project']
+                    })
+                }
+            });
         
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({
-            error: "Database error occurred while deleting projects!", //Database connection error
+            error: "Database error occurred while deleting project!", //Database connection error
         });
     }
 }

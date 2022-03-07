@@ -1,3 +1,5 @@
+const pool= require("../../configs/database");
+
 exports.getUnitAppliances = async(req, res)=>{
 
     const unitId = req.query.unitId

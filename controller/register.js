@@ -36,7 +36,7 @@ exports.register  =  async (req, res) => {
             //Inserting data into the database
 
             client
-            .query(`INSERT INTO public.users (FirstName, LastName, Role, Login, Password, email) VALUES ($1,$2,$3, LOWER($4), $5, $6);`, [ user.firstName, user.lastName, user.role, user.login, user.password, user.email], (err) => {
+            .query(`INSERT INTO public.users (FirstName, LastName, Role, Login, Password, email, status) VALUES ($1,$2,$3, LOWER($4), $5, $6, $7);`, [ user.firstName, user.lastName, user.role, user.login, user.password, user.email, 'Active'], (err) => {
 
                 if (err) {
                     flag  =  0; //If user is not inserted is not inserted to database assigning flag as 0/false.

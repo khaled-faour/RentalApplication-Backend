@@ -114,26 +114,25 @@ exports.editTenant = async(req, res)=>{
 }
 
 exports.deleteTenant = async(req, res)=>{
-    const {id} = req.body
-    console.log("ID: ",id)
+    const {tenant_id} = req.body
     try {
-        const data = await pool.query(`DELETE FROM public.tenants WHERE id = $1 RETURNING *`, [id], (err, result)=>{
-            if(err){
-                res.status(500).json({
-                    error: `Error deleting tenant: ${err}`
-                })
-            }else{
-                res.status(200).json({
-                    message: "Tenant DELETED!"
-                })
-            }
-        });
-       
+        const data = await pool.query(
+            `SELECT delete_tenant($1)`, [tenant_id],
+            (err, result)=>{
+                if(err){
+                    throw err;
+                }
+                else{
+                    res.status(200).json({
+                        result: result.rows[0]['delete_tenant']
+                    })
+                }
+            });
         
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({
-            error: "Database error occurred while deleting tenants!", //Database connection error
+            error: "Database error occurred while deleting tenant!", //Database connection error
         });
     }
 }

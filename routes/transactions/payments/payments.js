@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-const {authorization} = require('../../middleware/authorization')
-const {getPayments, addPayment, editPayment, deletePayment} = require('../../controller/payments/payments')
+const {authorization} = require('../../../middleware/authorization')
+const {getPayments, addPayment, editPayment, deletePayment} = require('../../../controller/transactions/payments/payments')
 
 router.get('/' ,authorization, getPayments); 
 
