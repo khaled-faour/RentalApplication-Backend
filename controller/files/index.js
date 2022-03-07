@@ -40,7 +40,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
     
 }
 
-exports.upload = async (req, res, next, path="")=>{
+exports.upload = async (req, res )=>{
+    const {path} = req.params;
     console.log({name: req.files.file.name,data: req.files.file.data})
     try {
         if (!req.files) {
