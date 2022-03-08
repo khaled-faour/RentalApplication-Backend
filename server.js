@@ -47,8 +47,8 @@ const transactions = require("./routes/transactions");
 
 const checkInOut = require("./routes/checkin-out/checkin-out")
 
-const receipts = require("./routes/receipts/receipts");
-const payments = require("./routes/payments/payments");
+// const receipts = require("./routes/receipts/receipts");
+// const payments = require("./routes/payments/payments");
 
 const aggregations = require("./routes/aggregations/index");
 const files = require("./routes/files");
@@ -109,8 +109,8 @@ app.use("/api/transactions", transactions);
 app.use("/api/aggregations", aggregations);
 app.use("/api/files", files);
 
-app.use("/api/receipts", receipts);
-app.use("/api/payments", payments);
+// app.use("/api/receipts", receipts);
+// app.use("/api/payments", payments);
 
 
 app.use("/api/checkInOut", checkInOut);
