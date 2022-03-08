@@ -81,6 +81,43 @@ exports.addTenant = async(req, res)=>{
     }
 }
 
+
+exports.addTenant = async(req, res)=>{
+    const {name, residentCenterStatus, textMessageStatus, identificationType, user, emails, phones} = req.body || null;
+    console.log(req.body);
+    try {
+            pool.query(
+                `CALL Add_Tenant($1, $2, $3, $4, $5, $6, $7)`,
+                [
+                    name,
+                    identificationType, 
+                    user, 
+                    residentCenterStatus, 
+                    textMessageStatus, 
+                    phones.join(),
+                    emails.join()
+                ], (err, result)=>{
+                if(err){
+                    throw err;
+                   
+                }else{
+                    return res.status(200).json({
+                        message: `Success`,
+                        result
+                    });
+                }
+            });
+        
+    } catch (error) {
+        console.log('Error:', error);
+        res.status(500).json({
+            error: "Database error occurred while adding Appliance!", 
+        });
+    }
+}
+
+
+
 exports.editTenant = async(req, res)=>{
     const {id, name, residentCenterStatus, textMessageStatus, identification_type, user, emails, phones} = req.body || null;
     try {

@@ -24,7 +24,7 @@ app.use('/appliances', appliances);
 app.use('/countries', countries);
 
 app.use('/cities', cities);
-app.use('/appliances', appliances)
+app.use('/appliances', appliances);
 app.use('/states', states);
 app.use('/fees', fees);
 app.use('/propertyTypes', propertyTypes);

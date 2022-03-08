@@ -31,7 +31,7 @@ exports.addPayment = async(req, res)=>{
     const tenantId = lease.tenant_id;
 
     let amount = 0;
-    fees.map((fee, index)=>{
+    fees.map((fee, index) => {
             console.log(fee)
             amount -= fee.price;
             const keys = Object.keys(fee)

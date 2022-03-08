@@ -12,6 +12,4 @@ router.put('/' , authorization, editLeaseType);
 
 router.delete('/', authorization, deleteLeaseType)
 
-
-
 module.exports = router;

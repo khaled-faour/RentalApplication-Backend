@@ -12,14 +12,12 @@ const {editCurrency} = require('../../controller/lookups/currency');
 
 const {deleteCurrency} = require('../../controller/lookups/currency');
 
-router.get('/', /* authorization, */ getAllCurrency);
+router.get('/', /*authorization,*/ getAllCurrency);
 
-router.post('/' ,/* authorization, */ addCurrency);
+router.post('/', /* authorization, */ addCurrency);
 
-router.put('/' ,/* authorization, */ editCurrency);
+router.put('/' , /*authorization,*/ editCurrency);
 
-router.delete('/' ,/* authorization, */ deleteCurrency);
-
-
+router.delete('/' , /*authorization,*/ deleteCurrency);
 
 module.exports = router;

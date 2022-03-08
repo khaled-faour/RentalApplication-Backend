@@ -53,7 +53,6 @@ exports.getProjects = async(req, res)=>{
 
 exports.addProject = async(req, res)=>{
     const {number, name,  region, country, city, street} = req.body
-    
     try {
         console.log()
         const data = await pool.query(
