@@ -81,7 +81,7 @@ exports.addTenant = async(req, res)=>{
     }
 }
 
-exports.editTenant = async(req, res)=>{
+exports.editTenant = async(req, res) => {
     const {id, name, residentCenterStatus, textMessageStatus, identification_type, user, emails, phones} = req.body || null;
     try {
         const data = await pool.query(`CALL UPDATE_TENANT($1, $2, $3, $4, $5, $6, $7, $8)`, 

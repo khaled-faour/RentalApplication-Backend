@@ -18,8 +18,6 @@ exports.getProject = async(req, res)=>{
         }else{
             res.status(200).json(rows)
         }
-        
-        
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({

@@ -73,9 +73,9 @@ exports.editRegion = async(req, res)=>{
 
 exports.deleteRegion = async(req, res)=>{
     const {id} = req.body
+    console.log(req.body)
     try {
         const data = await pool.query(`DELETE FROM public.regions WHERE id = $1 RETURNING *`, [id], (err, result)=>{
-            console.log(result.rows[0])
             if(err){
                 res.status(500).json({
                     error: `Error deletgin region: ${err}`

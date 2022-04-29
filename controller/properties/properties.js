@@ -55,17 +55,16 @@ exports.getProperties = async(req, res)=>{
 }
 
 
-exports.addProperty = async(req, res)=>{
+exports.addProperty = async(req, res) => {
     const {UForm, PForm} = req.body
-
-    
     try {
         pool.query(`CALL add_property($1, $2)`, [
             `[${JSON.stringify(PForm)}]`,
             JSON.stringify(UForm)
         ], (err, result)=>{
             if(err){
-                console.log("Error: ", err)
+                console.log("OOOOOO")
+               console.log("Error: ", err)
             }else{
                 res.status(200).json({
                     message: "Success",
@@ -73,7 +72,7 @@ exports.addProperty = async(req, res)=>{
             }
         });
     } catch (error) {
-        console.log('Error:', error);
+        console.log('Error11:', error);
         res.status(500).json({
             error: "Database error occurred while adding Property!", 
         });

@@ -1,13 +1,9 @@
 const pool= require("../../configs/database");
 
 exports.getUnits = async(req, res)=>{
-
     try {
         const data = await pool.query(
-            `SELECT *
-            FROM 
-                public.units
-             `);
+            `SELECT * FROM public.units`);
         const rows = data.rows;
         if(rows.length === 0){
             res.json({
@@ -15,9 +11,7 @@ exports.getUnits = async(req, res)=>{
             })
         }else{
             res.status(200).json(rows)
-        }
-        
-        
+        }   
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({
@@ -29,7 +23,6 @@ exports.getUnits = async(req, res)=>{
 
 exports.getUnOccupiedUnits = async (req, res)=>{
     try {
-
         const data = await pool.query(
             `SELECT *
              FROM 
@@ -44,8 +37,6 @@ exports.getUnOccupiedUnits = async (req, res)=>{
         }else{
             res.status(200).json(rows)
         }
-        
-        
     } catch (error) {
         console.log('Error:', error);
         res.status(500).json({
@@ -55,17 +46,16 @@ exports.getUnOccupiedUnits = async (req, res)=>{
 }
 
 
-exports.addUnit = async (req, res)=>{
+exports.addUnit = async (req, res) => {
         const unit = req.body;
     try {
-
+        console.log(unit)
         const data = await pool.query(
             `CALL add_unit($1)`,
             [JSON.stringify(unit)],
             (err, result)=>{
                 if(err){
                     throw err;
-                   
                 }else{
                     return res.status(200).json({
                         message: `Success`,
@@ -83,14 +73,18 @@ exports.addUnit = async (req, res)=>{
 }
 
 exports.updateUnit = async (req, res)=>{
+    console.log("PPPPPPPPPPPPPPPPPPPPPPPP")
     const unit = req.body;
 try {
 
+    console.log(unit)
     const data = await pool.query(
         `CALL update_unit($1)`,
-        [JSON.stringify(unit)],
-        (err, result)=>{
+        [JSON.stringify({...unit, appliances:[], fees:[]})],
+        (err, result) => {
+            console.log(JSON.stringify(unit))
             if(err){
+                console.log(err)
                 throw err;
             }else{
                 return res.status(200).json({

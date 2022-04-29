@@ -24,9 +24,12 @@ exports.getCities = async(req, res)=>{
 
 exports.addCity = async(req, res)=>{
     const {description} = req.body
+    console.log(req.body)
+    console.log("JJJJJJJJJJj")
     try {
             const data = await pool.query(`INSERT INTO public.cities (description) VALUES ($1)`, [description], (err)=>{
                 if(err){
+                    console.log(err)
                     res.status(500).json({
                         error: `Error adding city: ${err}`
                     })
@@ -39,6 +42,7 @@ exports.addCity = async(req, res)=>{
         
     } catch (error) {
         console.log('Error:', error);
+       
         res.status(500).json({
             error: "Database error occurred while adding city!", 
         });

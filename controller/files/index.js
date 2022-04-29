@@ -1,7 +1,6 @@
 const express = require("express");
 const fs = require('fs');
 const bodyParser = require("body-parser");
-const _ = require("lodash");
 const app = express();
 const pool= require("../../configs/database");
 
